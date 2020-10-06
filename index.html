@@ -1,0 +1,259 @@
+<!DOCTYPE html><html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SVG progress with anime.js v3.2.0</title>
+<style>
+.flex-content {
+    display: flex;
+}
+.flex-left {
+    flex: 1;
+    background-color:slateblue;
+}
+.flex-center {
+    flex: 1;
+}
+.flex-right {
+    flex: 1;
+    background-color:crimson;
+}
+#circular-progress {
+  background-color:#066ab8;
+  width:auto;
+  height:100%;
+  margin:0 auto;
+}
+#small-circular-progress {
+  background-color:#87CEFA;
+  width:auto;
+  height:100%;
+  margin:0 auto;
+}
+.circles {
+	/* to change origin of dash stroke */
+	transform-origin:center center;
+  transition: 1s ease-out;
+}
+.circles circle, path {
+	stroke-linecap:round;
+}
+#circular-progress-percentage {
+  z-index:2;
+  margin-top:-3em;
+  font-family:Arial,Helvetica Neue,Helvetica,sans-serif;
+  font-size:3em;
+  font-weight:bold;
+}
+</style>
+</head>
+<body>
+
+<h2>SVG progress with anime.js v3.2.0</h2>
+
+
+<div>
+  <span>Set progress to :</span><button>15</button> <button>50</button> <button>75</button> <button>100</button>
+</div>
+
+
+
+
+
+
+
+<div id="line-progress" class="show">
+  <svg class="line" viewbox="0 0 100 10">
+    <line x1="0" y1="5" x2="100" y2="5"
+      stroke="Gainsboro"
+      stroke-width="5" />
+    <line x1="0" y1="5" x2="50" y2="5"
+      stroke="LimeGreen"
+      stroke-width="3" />
+  </svg>
+</div>
+
+
+
+
+
+
+<div class="flex-content">
+  <div class="flex-left">
+
+    <div id="circular-progress" class="show">
+
+    <svg class="circles" viewbox="0 0 500 500">
+      <defs>
+        <radialGradient id="gradient-stroke" fx="50%" fy="50%" cx="50%" cy="50%" r="75%">
+          <stop offset="0%" stop-color="#B0E0E6"/>
+          <stop offset="100%" stop-color="#87CEFA"/>
+        </radialGradient>
+      </defs>
+      <circle	cx="250" cy="250" r="200" fill="transparent" stroke="#FFFFFF" stroke-width="30px" />
+      <!--
+      // x,y start position
+      // rx,ry radius x and y
+      // x1,y1 end position
+      <path d="M x,y A rx, ry, 0 1 1 x1, y1"/>
+
+        d="M200,300a100,100 0 1,0 200,0a100,100 0 1,0 -200,0"
+
+        d="M250,50 a 200,200, 0 1 1 0,400"
+      -->
+      <path class="circle"
+        d="M 250,50 a 200,200, 1 1 1 -1,0"
+        fill="transparent"
+        stroke="url(#gradient-stroke)"
+        stroke-width="30px"
+        stroke-dasharray="0 1260"/>
+    </svg>
+
+    </div>
+
+  </div>
+
+
+
+
+
+
+
+
+  <div class="flex-right">
+
+    <div id="small-circular-progress" class="show">
+
+    <svg class="circles" viewbox="0 0 100 100">
+      <!--
+      // x,y start position
+      // rx,ry radius x and y
+      // x1,y1 end position
+      <path d="M x,y A rx, ry, 0 1 1 x1, y1"/>
+
+        d="M200,300a100,100 0 1,0 200,0a100,100 0 1,0 -200,0"
+
+        d="M250,50 a 200,200, 0 1 1 0,400"
+
+        // clockwise
+        d="M 50,10 a 40,40, 1 1 1 -1,0"
+      -->
+      <path class="circle"
+        d="M 50,10 a 40,40, 1 1 0 1,0"
+        fill="transparent"
+        stroke="#066ab8"
+        stroke-width="5px"
+        stroke-dasharray="0 300"/>
+    </svg>
+
+    </div>
+
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" src="js/anime.min.js"></script>
+
+<script type="text/javascript">
+document.addEventListener("DOMContentLoaded", function(){
+
+  const animateCircularIndicator = (cssSelector, targetValue) => {
+    // // Update circular progress large
+    var targetElement = document.querySelector(cssSelector);
+
+    // At the maximum value of stroke-dashoffset the line will be hidden,
+    // with stroke-dashoffset = "0" the line will be drawn completely.
+
+    // // Get the current stroke dash offset
+    var fromValue = parseFloat(window.getComputedStyle(targetElement).strokeDashoffset);
+    // // Next line works ok as well
+    // var fromValue = targetElement.style.strokeDashoffset;
+
+    if (fromValue == NaN || fromValue == '') {
+      fromValue = 0;
+    }
+
+    // // Get the targeted stroke dash offset
+    var totalLength = targetElement.getTotalLength();
+    var toValue = totalLength * (1 - targetValue * 0.01);
+    var toValueAlt = Math.ceil(totalLength * (targetValue * 0.01));
+
+    console.log('animateCircularIndicator --->');
+    console.log('cssSelector = ', cssSelector, '; targetValue = ', targetValue);
+    console.log('fromValue = ', fromValue);
+    console.log('totalLength = ', totalLength);
+    console.log('toValue = ', toValue);
+    console.log('~~~~~~~~~~~~~');
+
+    anime({
+      targets: targetElement,
+      strokeDasharray: {
+        value: toValueAlt + ' ' + totalLength,
+        duration: 1000,
+        easing: 'easeOutQuart'
+      }
+    });
+
+  }
+
+
+
+
+  const animateLineIndicator = (cssSelector, targetValue) => {
+    // // Update line progress
+    var targetElement = document.querySelector(cssSelector);
+
+    // // Get the current stroke dash offset
+    var fromValue2 = window.getComputedStyle(targetElement).strokeDashoffset;
+
+    // // Next line works ok as well
+    // var fromValue2 = parseFloat(targetElement.style.strokeDashoffset);
+
+    if (fromValue2 == NaN || fromValue2 == '') {
+      fromValue2 = 0;
+    }
+
+    // // Get the targeted stroke dash offset
+    var totalLength2 = targetElement.getTotalLength();
+    var toValue2 = totalLength2 * (1 - targetValue * 0.01);
+
+    anime({
+      targets: targetElement,
+      x2: targetValue,
+      easing: 'easeInOutSine',
+      duration: 1000,
+      });
+
+  }
+
+
+
+
+  var buttons = document.querySelectorAll("button");
+  buttons.forEach(button => {
+    button.addEventListener("click", function(event) {
+
+      const targetValue = button.textContent;
+
+      console.log('button.textContent = ', targetValue);
+
+      animateCircularIndicator('#small-circular-progress > svg > path', targetValue);
+      animateCircularIndicator('#circular-progress > svg > path', targetValue);
+      animateLineIndicator('#line-progress > svg > line:nth-child(2)', targetValue);
+    });
+  });
+
+});
+</script>
+</body>
+</html>
